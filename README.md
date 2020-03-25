@@ -22,12 +22,16 @@ Google Form Add-on to automate the deployment of templatized resources.
 FormTemplate is published to the G-Suite marketplace for just Contino.io G-Suite domain.
 * Under "File" & "Manage versions" create/select a version.
 * Under "File" & "Project properties" note the Project Key MpEWpV9GCmTyHANsCxvtUJrlUvHYZZW4p
-* Under "File" & "Project properties" note "Scopes"
-https://www.googleapis.com/auth/calendar
-https://www.googleapis.com/auth/drive
-https://www.googleapis.com/auth/presentations
+* Under "File" & "Project properties" note "Scopes" (slightly enhanced)
 https://www.googleapis.com/auth/script.external_request
+https://www.googleapis.com/auth/calendar
+https://www.googleapis.com/auth/documents
+https://www.googleapis.com/auth/forms
+https://www.googleapis.com/auth/forms.currentonly
+https://www.googleapis.com/auth/presentations
+https://www.googleapis.com/auth/drive
 https://www.googleapis.com/auth/tasks
+* These API must also be enabled for gcp project: https://console.cloud.google.com/apis/library
 * "APIs & Services" & "OAuth consent screen"
 ** Application tye: Internal
 ** Application name: FormTemplate and pick logo 

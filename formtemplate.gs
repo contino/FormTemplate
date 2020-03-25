@@ -1,8 +1,19 @@
 /**
-DeliveryWizard:  G-Suite Form to automating Delivery kickoff.
+FormTemplate:  G-Suite Form to automating creation of templated assets.
 
-The Form submit will include variables which are used to automate and templatize Delivery assets.
+The Form submit will include variables which are used to automate and templatize assets.
 
+- Create new drive folder, copy drive template folder to new folder, apply templates.  (Link back to source doc and var.json)
+- Create Confluence folder from templates (from G-Docs or from Confluence Templates
+- Create Tasks for additional non-automated tasks to do
+- Create GitHub repo from templates
+- Create slack channel(s) #us-{{client}}-delivery, assign people
+- Create group calendar
+- Project GitHub Repository
+- Send out email to interested parties
+
+
+More vars to consider:
 {
 “Client_Full”: “Davita Healthcare”,
 “DressCode”: “Casual”,
@@ -15,37 +26,17 @@ The Form submit will include variables which are used to automate and templatize
 . . .
 }
 
-There is a client level, and a engagement/project level
+https://contino.atlassian.net/wiki/spaces/CONTINO/pages/1046773767/Confluence+Templates+-+Guide
+https://contino.atlassian.net/wiki/spaces/CONTINO/pages/1046708349/Engagement+Kickoff+Catalog
 
+Delivery has a client level and a engagement/project level
 engagements can have multiple workstreams: Overview, outcomes, Contino resources, client resources 
-* Outcome 01: Define & Refine Target Cloud Operating Model for H2’19 
-* Outcome 02: Assess & Categorize current Atlas and VRR Infrastructure applications and maturity
-
 Input from Kimble/SalesForce or update Kimble?
 existing docs: Deal Sheet, Expense Policies, SOW, Client org chart, assessment
+Templated Links, maybe form vars are supplemented with templated "derived": Jumbotron Link, Delivery Plan Link
+Could be some "loose" existing docs as input: (Expense Policy, SOW)
+Jinja2 or other TEMPLATE delimiters - should be consistent across asset type
 
-- Create slack channel(s) #us-{{client}}-delivery, assign people
-- Create group calendar
-- Create drive folder, copy drive template folder to new folder, apply templates.  (Link back to source doc and var.json)
-- Create Confluence folder from templates (from G-Docs or from Confluence Templates
-- Send out email to interested parties
-- Create Tasks for additional non-automated tasks to do
-- Create GitHub repo from templates
-
-Links:
-Project One-Pager in Confluence
-Google Drive Project Folder
-Project Slack channel(s)
-Project Travel Calendar
-Project GitHub Repository (if any)
-Expense Policy
-SOW
-Jumbotron Link
-Delivery Plan Link
-
-https://contino.atlassian.net/wiki/spaces/CONTINO/pages/1046773767/Confluence+Templates+-+Guide
-
-https://contino.atlassian.net/wiki/spaces/CONTINO/pages/1046708349/Engagement+Kickoff+Catalog
 
 */
 
@@ -70,6 +61,8 @@ function onSubmit(event) {
   var responses = new Object();
   itemResponses.forEach(function(e) { responses[e.getItem().getTitle().replace(/\s+/g, '')] = e.getResponse();  });
   
+  //TODO: picker to override shared folder for parent of desitinatino folder and template source folder
+
   //parentFolderId = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
   parentFolderId = "1UMCaMTv3dYTU1PR0hIrm1o_wPb7cpGO9";
   templateFolderId = "10tkr-9ugxqMPNjIKek7oObxa6NNzjRLi";
@@ -108,10 +101,10 @@ function test() {
 // if client folder does not already exist under the parent then create it and copy all the files under templateFolder to new clientFolder
 // save the response JSON
 // apply templating to all files in the clientFolder
+// other templated resources and automation
 function process(parentFolder, templateFolder, responses) {
 
-  var client = responses['Client'];
-    
+  var client = responses['Client'];    
   var topFolder;
   var topFolders = parentFolder.getFoldersByName(client);
   if (topFolders.hasNext()) {
@@ -131,7 +124,6 @@ function process(parentFolder, templateFolder, responses) {
     //file = Drive.Files.insert(varFile, JSON.stringify({"responses": responses }));
     DriveApp.removeFile(varFile);
   }
-
   Logger.log("creating " + VAR_JSON);
   varFile = DriveApp.createFile(VAR_JSON, JSON.stringify({"responses": responses }),"text/json");
   topFolder.addFile(varFile);
@@ -140,7 +132,9 @@ function process(parentFolder, templateFolder, responses) {
   applyTemplate(topFolder,responses);
 
   //TODO: apply templates to Confluence template
-
+  
+  //TODO: apply templates to GitHub projects
+  
   //submit to cloudfunction - this could be good for other automations
   //var url = "https://us-central1-slidetemplate.cloudfunctions.net/form-trigger";
   //submitCloudFunction(url,event);
@@ -148,15 +142,15 @@ function process(parentFolder, templateFolder, responses) {
   //TODO: save logo from url to logo file here  
   //TODO: create slack channel, add users
   //TODO: create delivery calendar, add users
-  //TODO:  create Tasks
+  //TODO: create Tasks
   //TODO: send email to users
 }
 
 //https://developers.google.com/apps-script/advanced/drive
-function fileUpload(url) {
+function fileUpload(title,url) {
   var image = UrlFetchApp.fetch(url.getBlob());
   var file = {
-    title: 'google_logo.png',
+    title: title,
     mimeType: 'image/png'
   };
   file = Drive.Files.insert(file, image);
@@ -170,13 +164,12 @@ function copyDrive(sourceFolder, destFolder) {
   while (files.hasNext()) {
     var file = files.next();
     file.makeCopy(file.getName(),destFolder);
-    Logger.log("copyDrive file="+file.getName());
+    //Logger.log("copyDrive file="+file.getName());
   }
   var folders = sourceFolder.getFolders();
   while (folders.hasNext()) {
     var folder = folders.next();
     var destSubFolder = destFolder.createFolder(folder.getName());
-    //Logger.log("copyDrive folder="+folder.getName());
     copyDrive(folder,destSubFolder);
   }
 }
@@ -186,10 +179,14 @@ function applyTemplate(folder,varList) {
   var files = folder.getFiles();
   while (files.hasNext()) {
     var file = files.next();
-    Logger.log("applyTemplate file="+file.getName());
+    Logger.log("applyTemplate file="+file.getName() + file.getMimeType());
     if ('application/vnd.google-apps.presentation' === file.getMimeType()) {
       var presentation = SlidesApp.openByUrl(file.getUrl());
       applySlideTemplate(presentation, varList);
+    }
+    if ('application/vnd.google-apps.document' === file.getMimeType()) {
+      var doc = DocumentApp.openByUrl(file.getUrl());
+      applyDocTemplate(doc, varList);
     }
   }
   var subFolders = folder.getFolders();
@@ -199,10 +196,46 @@ function applyTemplate(folder,varList) {
   }
 }
 
+function applyDocTemplate(doc,varList) {
+  //templateSmart(doc,varList);
+  for (key in varList) {
+    if (varList[key] !== null) {
+      var searchPattern = (TEMPLATE_PREFIX + "\\s*" + key + "\\s*" + TEMPLATE_SUFFIX).replace("$", "\\$");
+      if (!key.startsWith(TEMPLATE_IMAGE)) {
+        doc.getBody().replaceText(searchPattern, varList[key]);
+      } else {
+        Logger.log(varList[key]);
+        var image = UrlFetchApp.fetch(varList[key]).getBlob();
+        do {
+          var next = replaceTextToImage(doc.getBody(), searchPattern, image);
+          //force width, maintain aspect ratio
+          //var next = replaceTextToImage(doc.getBody(), searchPattern, image, 200);
+        } while (next);
+      }
+    }
+  }
+}
+
+function replaceTextToImage(body, searchText, image, width) {
+  var next = body.findText(searchText);
+  if (!next) return;
+  var r = next.getElement();
+  r.asText().setText("");
+  var img = r.getParent().asParagraph().insertInlineImage(0, image);
+  if (width && typeof width == "number") {
+    var w = img.getWidth();
+    var h = img.getHeight();
+    img.setWidth(width);
+    img.setHeight(width * h / w);
+  }
+  return next;
+} 
+
 function applySlideTemplate(presentation,varList) {
   templateSmart(presentation,varList);
   for (key in varList) {
     if (!key.startsWith(TEMPLATE_IMAGE)) {
+      //TODO: whitespace between TEMPLATE_PREFIX and key and TEMPLATE_SUFFIX matters!
       if (varList[key] !== null) presentation.replaceAllText(TEMPLATE_PREFIX + key + TEMPLATE_SUFFIX, varList[key], true);
     }
   }
@@ -220,11 +253,11 @@ function templateSmart(presentation,varList) {
     var elements = masters[i].getPageElements().forEach(function(element) {   
      if (element.getPageElementType() ===  SlidesApp.PageElementType.SHAPE) {
        element = element.asShape()
-       Logger.log("replace IMAGE master " +element);
+       //Logger.log("replace IMAGE master " +element);
        text = element.getText();
        for (key in varList) {
          if ((varList[key] != null) && (varList[key].length > 0) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX + TEMPLATE_IMAGE)) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX+key))) {
-           Logger.log("replace IMAGE master " + i + " " + key  + '=' + varList[key]);
+           //Logger.log("replace IMAGE master " + i + " " + key  + '=' + varList[key]);
            var image = masters[i].insertImage(varList[key]);
            resizeImage(image,element);
            replacedElements.push(element);
@@ -232,7 +265,7 @@ function templateSmart(presentation,varList) {
        }
      }
     });
-    Logger.log(replacedElements);
+    //Logger.log(replacedElements);
     replacedElements.forEach(function(element) {
       element.remove();
     });
@@ -247,7 +280,7 @@ function templateSmart(presentation,varList) {
        text = element.getText();
        for (key in varList) {
          if ((varList[key] !== null) && (varList[key].length > 0) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX + TEMPLATE_IMAGE)) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX+key))) {
-           Logger.log("replace IMAGE layout " + i + " " + key  + '=' + varList[key]);
+           //Logger.log("replace IMAGE layout " + i + " " + key  + '=' + varList[key]);
            var image = layouts[i].insertImage( varList[key]);
            resizeImage(image,element);
            replacedElements.push(element);
@@ -255,7 +288,7 @@ function templateSmart(presentation,varList) {
        }
      }
     });
-    Logger.log(replacedElements);
+    //Logger.log(replacedElements);
     replacedElements.forEach(function(element) {
       element.remove();
     });
@@ -270,7 +303,7 @@ function templateSmart(presentation,varList) {
        text = element.getText();
        for (key in varList) {
          if ((varList[key] !== null) && (varList[key].length > 0) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX + TEMPLATE_IMAGE)) && (text.asRenderedString().startsWith(TEMPLATE_PREFIX+key))) {
-           Logger.log("replace IMAGE slide " + i + " " + key  + '=' + varList[key]);
+           //Logger.log("replace IMAGE slide " + i + " " + key  + '=' + varList[key]);
            var image = slides[i].insertImage( varList[key]);
            resizeImage(image,element);
            replacedElements.push(element);
@@ -278,7 +311,7 @@ function templateSmart(presentation,varList) {
        }
      }
     });
-    Logger.log(replacedElements);
+    //Logger.log(replacedElements);
     replacedElements.forEach(function(element) {
       element.remove();
     });
