@@ -1,0 +1,150 @@
+<!--
+-->
+<!-- [START SlideTemplate] -->
+<html>
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <!-- The CSS package above applies Google styling to buttons and other elements. -->
+    <style>
+    .branding-below {
+      bottom: 54px;
+      top: 0;
+    }
+    .branding-text {
+      left: 7px;
+      position: relative;
+      top: 3px;
+    }
+    .logo {
+      vertical-align: middle;
+    }
+    .width-100 {
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+    }
+    label {
+      font-weight: bold;
+    }
+    #creator-options,
+    #respondent-options {
+      background-color: #eee;
+      border-color: #eee;
+      border-width: 5px;
+      border-style: solid;
+      display: none;
+    }
+    #creator-email,
+    #respondent-email,
+    #button-bar,
+    #submit-subject {
+      margin-bottom: 10px;
+    }
+
+    #response-step {
+      display: inline;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar branding-below">
+    <form name="main">
+      <div id="button-bar">
+        <button class="blue" id="run-reload">Reload</button>
+        <button class="blue" id="run-template">Run</button>
+      </div>
+      <div class="block" id="vars"></div>
+      <h5 class="error" id="error"></h5>
+    </form>
+    <br>
+    </div>
+    <div class="sidebar bottom">
+      <img alt="logo" class="logo"
+      src="https://github.com/contino/SlideTemplate/raw/master/logo.png" width="60" height="27">
+      <span class="gray branding-text">SlideTemplate</span>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      $(function() {
+        updateVars();
+        $('#run-reload').click(updateVars);
+        $('#run-template').click(runTemplate);
+      });
+
+      /**
+       * Runs a server-side function to apply templates to all slides.
+       */
+      function runTemplate() {
+        //showPicker();
+        this.disabled = true;
+        //collect variable key/value for each var from html
+        var varList = new Object();
+        var tv = document.getElementsByClassName("templatevar");   
+        Object.entries(tv).forEach(([key, value]) => {
+           varList[value['id'].substr(9)]=value['value'];
+        });
+        
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numElements, element) {
+              element.disabled = false;
+              if (numElements === 0) {
+                $('#error').empty()
+                    .append('Nothing was done, you sure this is a template?')
+                    .append('<br/>');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            //.copyAndTemplate("1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S",varList);
+            .template(varList);
+      }
+      
+      /**
+       * Runs a server-side function to collect the template vars on all slides.
+       */
+      function updateVars() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(vars, element) {
+              element.disabled = false;
+              if (vars.length === 0) {
+                $('#error').empty()
+                    .append('No Variables found.')
+                    .append('<br/>')
+                    .append('Presentation should have variables.');
+              }
+              var t = ''
+              Object.entries(vars).forEach(([key, value]) => {
+                if (value.startsWith('IMAGE')) {
+                  //TODO: google drive URL picker
+                  t += '<label for=text_var_' +  value + '">' + value.substr(5) + ':</label>';
+                  t += '<input class="templatevar" type="text" id="text_var_' +  value + '" name="text_var_' +  value + '"><br>'
+                } else {
+                  t += '<label for=text_var_' +  value + '">' +  value + ':</label>';
+                  t += '<input class="templatevar" type="text" id="text_var_' +  value + '" name="text_var_' +  value + '"><br>'
+                }
+              });
+              $('#vars').html(t);
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .collectVars();
+      }
+    </script>
+  </body>
+</html>
+<!-- [END SlideTemplate] -->
