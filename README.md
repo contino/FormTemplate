@@ -7,12 +7,12 @@ Google Form Add-on to automate the deployment of templatized resources.
 * Open/create a Google Form.
 * Install the FormTemplate from the Add-ons MarketPlace https://gsuite.google.com/marketplace/mydomainapps (must be logged in to contino G-suite domain)
 * Accept authorizations to complete installation.
-* Click Add-ons & **FormTemplate** & Open.
+* Try and existing test form https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit (or Create your own new Form)
 * Fill in the form with desired value for each ${} Variable. 
-* Submit the form to copy the templated resources and apply the templating.
+* Submit the form to create a new folder and copy the templated resources and apply the templating.
 
 ## Forms and Templates
-* [DeliveryWizard](https://docs.google.com/forms/d/1ZsFcanHxZ3eq05TZS-p2P9tCs_kMJIqjJ3JsUJITlnQ/edit)
+* [FormTemplate Test](https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit)
 * [TestTemplate](https://docs.google.com/presentation/d/1fqtCE8iTxzaf1ZgcICB_qb4cjEaFoOuXnj9xG6PlMH8/edit#slide=id.g5e5b0c9b58_0_1)
 * [Standard Project Kickoff](https://docs.google.com/presentation/d/1bb_Dw5Hyvb8POGhNyoLSxw9dIwKMgKsv7CUBFJarf8s)
 * [Data Strategy Pitch Template](https://docs.google.com/presentation/d/1LYlnNRtLgAOS29H29M5cUGtHKIVFtpKJsvPIzQzQi0U/edit#slide=id.g7ebd95ecfd_0_316)
