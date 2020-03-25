@@ -7,7 +7,7 @@ Google Form Add-on to automate the deployment of templatized resources.
 * Open/create a Google Form.
 * Install the FormTemplate from the Add-ons MarketPlace https://gsuite.google.com/marketplace/mydomainapps (must be logged in to contino G-suite domain)
 * Accept authorizations to complete installation.
-* Try and existing test form https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit (or Create your own new Form)
+* Try existing test form https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit (or Create your own new Form)
 * Fill in the form with desired value for each ${} Variable. 
 * Submit the form to create a new folder and copy the templated resources and apply the templating.
 
