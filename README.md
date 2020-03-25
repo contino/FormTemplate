@@ -5,7 +5,7 @@ Google Form Add-on to automate the deployment of templatized resources.
 
 ## Try it out
 * Open/create a Google Form.
-* Install the FormTemplate from the Add-ons MarketPlace (must be logged in to contino G-suite domain)
+* Install the FormTemplate from the Add-ons MarketPlace https://gsuite.google.com/marketplace/mydomainapps (must be logged in to contino G-suite domain)
 * Accept authorizations to complete installation.
 * Click Add-ons & **FormTemplate** & Open.
 * Fill in the form with desired value for each ${} Variable. 
@@ -23,33 +23,41 @@ FormTemplate is published to the G-Suite marketplace for just Contino.io G-Suite
 * Under "File" & "Manage versions" create/select a version.
 * Under "File" & "Project properties" note the Project Key MpEWpV9GCmTyHANsCxvtUJrlUvHYZZW4p
 * Under "File" & "Project properties" note "Scopes" (slightly enhanced)
-https://www.googleapis.com/auth/script.external_request
-https://www.googleapis.com/auth/calendar
-https://www.googleapis.com/auth/documents
-https://www.googleapis.com/auth/forms
-https://www.googleapis.com/auth/forms.currentonly
-https://www.googleapis.com/auth/presentations
-https://www.googleapis.com/auth/drive
-https://www.googleapis.com/auth/tasks
+```
+  https://www.googleapis.com/auth/script.external_request
+  https://www.googleapis.com/auth/calendar
+  https://www.googleapis.com/auth/documents
+  https://www.googleapis.com/auth/forms
+  https://www.googleapis.com/auth/forms.currentonly
+  https://www.googleapis.com/auth/presentations
+  https://www.googleapis.com/auth/drive
+  https://www.googleapis.com/auth/tasks
+```
 * These API must also be enabled for gcp project: https://console.cloud.google.com/apis/library
 * "APIs & Services" & "OAuth consent screen"
-** Application tye: Internal
-** Application name: FormTemplate and pick logo 
+```
+  Application tye: Internal
+  Application name: FormTemplate and pick logo 
+```
 * "APIs & Services" & "Credentials": create credentials drop-down menu, select OAuth client ID, Application type=Web, fill in the resulting form if needed. Click Create when finished, download your credential file containing your client ID and client secret.
 https://console.cloud.google.com/apis/credentials/oauthclient/599254386247-n50a9np8gtjc4a027lgdfbm0s2qal0dm.apps.googleusercontent.com?project=arched-run-214623
 * Enable G Suite Marketplace SDK 
 * "Configuration"
 https://console.cloud.google.com/apis/library/appsmarket-component.googleapis.com?q=Marketplace&id=1e37cda3-dfcf-4c07-9bec-fa8b595aa4d5&project=arched-run-214623&authuser=0&folder&organizationId
-** Fill in required values
-** Add Oauth 2.0 Scopes from above
-** Forms add-on: MpEWpV9GCmTyHANsCxvtUJrlUvHYZZW4p and version from above
-** Visiblity: My Domain (only contino.io)
+```
+  Fill in required values
+  Add Oauth 2.0 Scopes from above
+  Forms add-on: MpEWpV9GCmTyHANsCxvtUJrlUvHYZZW4p and version from above
+  Visiblity: My Domain (only contino.io)
+```
 * "Publish"
-** Fill in required values
-** Developer website: https://github.com/contino/FormTemplate
-** Post Install Tip: Fill out form and submit to generate templated assets
-** Category: Office Application
-** All regions
+```
+  Fill in required values
+  Developer website: https://github.com/contino/FormTemplate
+  Post Install Tip: Fill out form and submit to generate templated assets
+  Category: Office Application
+  All regions
+```
 
 ## Install
 * quicklink: https://gsuite.google.com/marketplace/mydomainapps
