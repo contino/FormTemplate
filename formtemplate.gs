@@ -56,8 +56,18 @@ var TDEFAULT_EMPLATE_FOLDER_ID = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
 
 function onOpen(event) {
   FormApp.getUi().createAddonMenu()
-      .addItem('picker','showPicker')
+      .addItem('Output Folder','showPicker')
       .addToUi();
+  
+//  var form = FormApp.getActiveForm();
+//  for (item in form.getItems(ListItem)) {
+//       Logger.log(item.getTitle());
+    //TODO: People API to fill in choices
+//    item.setChoices([
+//         item.createChoice('Bill Hood'),
+//         item.createChoice('Mike Connors')
+//     ]);
+//   }
 }
 
 /**
@@ -134,9 +144,6 @@ function process(responses) {
   }
   var parentFolder = DriveApp.getFolderById(properties.getProperty('PARENT_FOLDER_ID'));
   var templateFolder = DriveApp.getFolderById(properties.getProperty('TEMPLATE_FOLDER_ID'));
-  
-//  var parentFolder = DriveApp.getFolderById();
-//  var templateFolder = DriveApp.getFolderById(TEMPLATE_FOLDER_ID);
   Logger.log("parentFolder " + parentFolder.getName());
   Logger.log("templateFolder " + templateFolder.getName());
 
@@ -241,6 +248,12 @@ function applyDocTemplate(doc,varList) {
       var searchPattern = (TEMPLATE_PREFIX + "\\s*" + key + "\\s*" + TEMPLATE_SUFFIX).replace("$", "\\$");
       if (!key.startsWith(TEMPLATE_IMAGE)) {
         doc.getBody().replaceText(searchPattern, varList[key]);
+        if (doc.getHeader() != null) {
+          doc.getHeader().rereplaceText(searchPattern, varList[key]);
+        }
+        if (doc.getHeader() != null) {
+          doc.getFooter().replaceText(searchPattern, varList[key]);
+        }
       } else {
         Logger.log(varList[key]);
         var image = UrlFetchApp.fetch(varList[key]).getBlob();
@@ -249,6 +262,16 @@ function applyDocTemplate(doc,varList) {
           //force width, maintain aspect ratio
           //var next = replaceTextToImage(doc.getBody(), searchPattern, image, 200);
         } while (next);
+        if (doc.getHeader() != null) {
+          do {
+            var next = replaceTextToImage(doc.getHeader(), searchPattern, image);
+          } while (next);
+        }
+        if (doc.getFooter() != null) {
+          do {
+            var next = replaceTextToImage(doc.getFooter(), searchPattern, image);
+          } while (next);
+        }
       }
     }
   }
