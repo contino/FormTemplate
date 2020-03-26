@@ -52,7 +52,7 @@ var VAR_JSON = "var.json";
 //var DEFAULT_TEMPLATE_FOLDER_ID = "10tkr-9ugxqMPNjIKek7oObxa6NNzjRLi";
 //Shared Drive
 var DEFAULT_PARENT_FOLDER_ID =  "147fs_NGIcDtl287iDuSpRvPETDPLcxLH";
-var TDEFAULT_EMPLATE_FOLDER_ID = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
+var DEFAULT_TEMPLATE_FOLDER_ID = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
 
 function onOpen(event) {
   FormApp.getUi().createAddonMenu()
