@@ -60,9 +60,10 @@
         if (action == google.picker.Action.PICKED) {
             var doc = data[google.picker.Response.DOCUMENTS][0];
             var folderId = doc[google.picker.Document.ID];
-            document.getElementById('result').innerHTML = folderId;
-            //copyAndOpen(folderId);
-            //google.script.host.close();
+            document.getElementById('result').innerHTML = 'Top output folder set to ' + folderId;
+            //setPickerFolder(folderId) ;
+            var properties = PropertiesService.getScriptProperties();
+            properties.setProperty('PARENT_FOLDER_ID', folderId);
         } else if (action == google.picker.Action.CANCEL) {
             google.script.host.close();
         }

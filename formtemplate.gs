@@ -47,9 +47,44 @@ var TEMPLATE_SUFFIX = '}';
 var TEMPLATE_IMAGE = 'IMAGE';
 var VAR_JSON = "var.json";
 
+//Local for testing
+//var DEFAULT_PARENT_FOLDER_ID =  "1UMCaMTv3dYTU1PR0hIrm1o_wPb7cpGO9";
+//var DEFAULT_TEMPLATE_FOLDER_ID = "10tkr-9ugxqMPNjIKek7oObxa6NNzjRLi";
+//Shared Drive
+var DEFAULT_PARENT_FOLDER_ID =  "147fs_NGIcDtl287iDuSpRvPETDPLcxLH";
+var TDEFAULT_EMPLATE_FOLDER_ID = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
+
+function onOpen(event) {
+  FormApp.getUi().createAddonMenu()
+      .addItem('picker','showPicker')
+      .addToUi();
+}
+
+/**
+ * Displays an HTML-service dialog that contains client-side
+ * JavaScript code for the Google Picker API.
+ */
+function showPicker() {
+  var html = HtmlService.createHtmlOutputFromFile('picker.html')
+      .setWidth(600)
+      .setHeight(425)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  FormApp.getUi().showModalDialog(html, 'Select Folder');
+}
+
+function getOAuthToken() {
+  DriveApp.getRootFolder();
+  return ScriptApp.getOAuthToken();
+}
+
+function setPickerFolder(folderId) {
+  Logger.log("setPickerFolder" + folderId);
+  var properties = PropertiesService.getScriptProperties();
+  properties.setProperty('PARENT_FOLDER_ID',folderId);
+}
+
 // This function will be called when the form is submitted
-function onSubmit(event) {
-  
+function onSubmit(event) { 
   // The event is a FormResponse object:
   // https://developers.google.com/apps-script/reference/forms/form-response
   var formResponse = event.response;
@@ -59,25 +94,12 @@ function onSubmit(event) {
   // Gets the actual response strings from the array of ItemResponses, just the values as a string[]
   //var responses = itemResponses.map(function getResponse(e) { return e.getItem().getTitle().replace(/\s+/g, '')+e.getResponse(); });
   var responses = new Object();
-  itemResponses.forEach(function(e) { responses[e.getItem().getTitle().replace(/\s+/g, '')] = e.getResponse();  });
-  
-  //TODO: picker to override shared folder for parent of desitinatino folder and template source folder
-
-  //parentFolderId = "1F0ZH3d9V37ZIV75D8ToEaF7-Euj8NX4S";
-  parentFolderId = "1UMCaMTv3dYTU1PR0hIrm1o_wPb7cpGO9";
-  templateFolderId = "10tkr-9ugxqMPNjIKek7oObxa6NNzjRLi";
-  var parentFolder = DriveApp.getFolderById(parentFolderId);
-  var templateFolder = DriveApp.getFolderById(templateFolderId);  
-  
-  process(parentFolder, templateFolder, responses);
+  itemResponses.forEach(function(e) { responses[e.getItem().getTitle().replace(/\s+/g, '')] = e.getResponse();  });  
+  process(responses);
 }
 
 //used for debug
 function test() {
-  parentFolderId = "1UMCaMTv3dYTU1PR0hIrm1o_wPb7cpGO9";
-  templateFolderId = "10tkr-9ugxqMPNjIKek7oObxa6NNzjRLi";
-  var parentFolder = DriveApp.getFolderById(parentFolderId);
-  var templateFolder = DriveApp.getFolderById(templateFolderId);  
   var responses = {"Client": "ACME", 
                    "IMAGElogoUrl": "https://github.com/contino/SlideTemplate/raw/master/icon96_96.png",
                    "ProjectName": "projectx", 
@@ -95,16 +117,32 @@ function test() {
                    "ConferenceType": "Google",
                    "ConferenceID": "https://chat.davita.com"    
                   }
-  process(parentFolder, templateFolder, responses);
+  process(responses);
 }
 
 // if client folder does not already exist under the parent then create it and copy all the files under templateFolder to new clientFolder
 // save the response JSON
 // apply templating to all files in the clientFolder
 // other templated resources and automation
-function process(parentFolder, templateFolder, responses) {
+function process(responses) {
+  var properties = PropertiesService.getScriptProperties();
+  if (properties.getProperty('PARENT_FOLDER_ID') == null) {
+    properties.setProperty('PARENT_FOLDER_ID',DEFAULT_PARENT_FOLDER_ID);
+  }
+  if (properties.getProperty('TEMPLATE_FOLDER_ID') == null) {
+    properties.setProperty('TEMPLATE_FOLDER_ID',DEFAULT_TEMPLATE_FOLDER_ID);
+  }
+  var parentFolder = DriveApp.getFolderById(properties.getProperty('PARENT_FOLDER_ID'));
+  var templateFolder = DriveApp.getFolderById(properties.getProperty('TEMPLATE_FOLDER_ID'));
+  
+//  var parentFolder = DriveApp.getFolderById();
+//  var templateFolder = DriveApp.getFolderById(TEMPLATE_FOLDER_ID);
+  Logger.log("parentFolder " + parentFolder.getName());
+  Logger.log("templateFolder " + templateFolder.getName());
 
   var client = responses['Client'];    
+  Logger.log("Client " + client);
+
   var topFolder;
   var topFolders = parentFolder.getFoldersByName(client);
   if (topFolders.hasNext()) {
