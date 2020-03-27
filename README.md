@@ -8,11 +8,13 @@ Google Form Add-on to automate the deployment of templatized resources.
 * Install the FormTemplate from the Add-ons MarketPlace https://gsuite.google.com/marketplace/mydomainapps (must be logged in to contino G-suite domain)
 * Accept authorizations to complete installation.
 * Try existing test form https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit (or Create your own new Form)
+* The "top" output directory will default to the standard "Delivery" location, but can be change using the FormTemplate addon "Output Folder" menu item
 * Fill in the form with desired value for each ${} Variable. 
 * Submit the form to create a new folder and copy the templated resources and apply the templating.
+* All asset in the "source" template directory will be copied to a new "client" folder under the "top" output directory, and templating will be applied to each. Form responses are saved in the client folder to vars.json file.
+* Be patient, it can take a while to copy the assets over to the new "client" folder.
 
-## Forms and Templates
-* [FormTemplate Test](https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit)
+v* [FormTemplate Test](https://docs.google.com/forms/d/1htminAZqalsdj4EIP8kpvE_wgutUGoUMTyTIXiisb_E/edit)
 * [TestTemplate](https://docs.google.com/presentation/d/1fqtCE8iTxzaf1ZgcICB_qb4cjEaFoOuXnj9xG6PlMH8/edit#slide=id.g5e5b0c9b58_0_1)
 * [Standard Project Kickoff](https://docs.google.com/presentation/d/1bb_Dw5Hyvb8POGhNyoLSxw9dIwKMgKsv7CUBFJarf8s)
 * [Data Strategy Pitch Template](https://docs.google.com/presentation/d/1LYlnNRtLgAOS29H29M5cUGtHKIVFtpKJsvPIzQzQi0U/edit#slide=id.g7ebd95ecfd_0_316)
@@ -64,10 +66,47 @@ https://console.cloud.google.com/apis/library/appsmarket-component.googleapis.co
 * or in Add-ons marketplace, search for "FormTemplate"
 * From "Script editor" & "Edit" & "Current Project's triggers", add trigger: OnSubmit, Head, From form, On form submit, Notify me immediatlye
 
-
 bhood gcp account, project https://console.cloud.google.com/apis/api/appsmarket.googleapis.com/overview?project=formtemplate
 * https://developers.google.com/gsuite/add-ons/how-tos/editor-publish-overview
 * https://developers.google.com/gsuite/add-ons/how-tos/publishing-editor-addons
+
+## General Templating Guidelines
+* Standardize variable DELMITER approaches such as ${var} or jinja2 {{var}} across all templated assets would be preferred.
+* Templatized assets other than G-suite assets (e.g. Confluence templates/blueprints, git repos, etc.) may be optimally used with their native DELIMITERs.  For example, some confluence pages use <var>. At a mimimum, each asset type should use the same preferred DELIMITERs across all templates and jinja2 {{ }} should be default if not advantage is gain by using another DELIMITER.
+* Google G-suite assets (Slides, Docs, Sheets) should indicate variables using common DELIMITERS jinja2 {{var}}.
+* Allowed characters include [A-Za-z0-9_ ], so underscore or spaces or camelcase can be use in variable names.  In Add-ons and Forms, the **var** is presented to the user and must align with values in the templated assets.
+* IMAGE variables are indicated with a prefix of IMAGE on the variable name.  These values must a full http/https url to a image resource.  For example, ${IMAGElogoUrl} indicates a logoUrl which must be a http/https url to an image.  For Slides, this variable must be in it's own textbox by itself, and the image will be resized to fix the text box dimensions (future dditional semantics on the IMAGE var could indicate sizing) and the textbox is removed.  Textbox should have the same aspect ratio everywhere, but can be resized to fit space. 
+* For Docs, IMAGE vars are replace inline wherever they appears as text.
+* The most common IMAGE application is for logo replacement, so a libary of client logs with a common aspect ratio and transparent background should be maintained. 
+* G-suite features such as Slide Master/Layout and Doc Header/Footer should be used whenever possible.  Template processing will occur on these as in the body portion of the G-Suite asset.
+* Formatting of elements which contain template variables should be constructed to render well with a variety of short/long values.
+
+## Template Variable Guidelines
+The **var** portion of the ${**var**} should follow common naming practices whenever possible to maximimize template utility.
+* Each "domain" such as delivery or business development or HR will typically have a vocabulary of commonly used variables, and we should stive to maintain commonality across all assets and certainly within a "domain".  Since anyone can easily add new variables to templated assets, we may find it useful to automate the checking of compliance of variables to standardized variables in the future. This could be done by scanning or during the process of submitting or updating a templated resource to a common libary.
+* In addition to names, type and validation for each variable should be adhered to.  
+* Maximum length guidelines should be included for potential outliers (e.g. foreign names or just really long project names). In some cases the templated asset will react well to these by scrolling or fitting, but in other cases text could overlap and require manual resizing.
+* Google Forms should enforce validation.
+* For Deliver domain, standard variables include:
+```
+${Client}  - Client Name
+${ProjectName} - Project Name
+${Stakeholder} - Stakeholder Full Name
+${Location} - Location of kick-off
+${TP} - Technical Principal Full Name
+${AP} - Account Principal Full Name
+${CP} - Client Principal Full Name
+${LC1}  - Lead Consultant Full Name
+${LC2}  - Lead Consultant Full Name
+${Outcome1}  - Outcome 1 from  SOW
+${Outcome2}  - Outcome 2 from  SOW
+${Outcome3}  - Outcome 3 from  SOW
+${Outcome4}  - Outcome 4 from  SOW
+${Outcome5}  - Outcome 5 from  SOW 
+${TimeZone}  - Local time zone @ kickoff location. example: Eastern Standard Time (EST)
+${ConferenceType}  - Zoom, WebEx, etc
+${ConferenceID}  - ID to get onto conference bridge / webshare
+```
 
 ## Dev set up (embedded)
 * Your form should have question "titles" which match those used in the templated resources. Create a new Google Form and add some variables or use an existing Form that has questions already.
